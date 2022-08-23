@@ -5,10 +5,14 @@
 //Require
 const express = require('express');
 require('dotenv').config();
+const cors = require('cors');
+const allData = require('./weather.json');
+
 
 // Use
 const app = express();
 const PORT = process.env.PORT || 3002;
+app.use(cors());
 
 // Routes
 app.get('/', (request, response) => {
@@ -16,8 +20,14 @@ app.get('/', (request, response) => {
 });
 
 app.get('/weather', (request, response) => {
-  let obj = new Weather(request.query.searchQuery, request.query.lat, request.query.lon);
-  response.send(obj);
+  try {
+    console.log(request.query.city);
+    let forecastObjArr = (getForecast(request.query.city));
+    response.send(forecastObjArr);
+  } catch(e) {
+    next(e);
+  }
+  
 });
 
 app.get('*', (request, response) => {
@@ -25,14 +35,29 @@ app.get('*', (request, response) => {
 });
 
 // Errors
+app.use((error, request, response, next) => {
+  response.status(500).send(error.message);
+});
 
 // Classes
-class Weather {
-  constructor(searchQuery, lat, lon) {
-    this.searchQuery = searchQuery;
-    this.lat = lat;
-    this.lon = lon;
+class Forecast {
+  constructor(description, date) {
+    this.description = description;
+    this.date = date;
   }
+}
+
+let getForecast = (searchQuery) => {
+  let weatherObj = allData.find(obj => obj.city_name === searchQuery);
+  let objData = weatherObj.data;
+  let forecastArr = objData.reduce((accumulator, current) => {
+    let description = `Low of ${current.app_min_temp}, high of ${current.app_min_temp} with ${current.weather.description.toLowerCase()}`;
+    let date = current.valid_date;
+    let forecast = new Forecast(description, date);
+    accumulator.push(forecast);
+    return accumulator;
+  }, []);
+  return forecastArr;
 }
 
 
