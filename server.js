@@ -23,20 +23,25 @@ app.get('/', (request, response) => {
 });
 
 app.get('/weather', (request, response, next) => {
-    axios.get('https://api.weatherbit.io/v2.0/current', {
-      params: {
-        key: WEATHER_API_KEY,
-        lat: request.query.lat,
-        lon: request.query.lon
-      }
-    }).then(function (weatherData) {
-      let forecast = new Forecast(weatherData.data.data[0]);
-      response.send(forecast);
-    }).catch(function (error) {
-      next(error);
-    }).then(function () {
-      console.log('Data not found');
-    });
+  console.log(request.query);
+  axios.get('https://api.weatherbit.io/v2.0/forecast/daily', {
+    params: {
+      key: WEATHER_API_KEY,
+      lat: request.query.lat,
+      lon: request.query.lon,
+      days: '5',
+      units: 'I'
+    }
+  }).then(function (weatherData) {
+    let fiveDayForecast = weatherData.data.data.map(forecast => {
+      return new Forecast(forecast);
+    })
+    response.send(fiveDayForecast);
+  }).catch(function (error) {
+    next(error);
+  }).then(function () {
+    console.log('Data not found');
+  });
 });
 
 app.get('/movies', (request, response, next) => {
@@ -67,19 +72,19 @@ app.use((error, request, response, next) => {
 // Classes
 class Forecast {
   constructor(weatherData) {
-    this.temp = weatherData.app_temp;
+    this.temp = weatherData.temp;
     this.description = weatherData.weather.description;
-    this.date = weatherData.ob_time;
+    this.date = weatherData.datetime;
   }
 }
 
 class Movie {
   constructor(movieData) {
     this.title = movieData.original_title;
-    this.overview= movieData.overview;
-    this.imgPath ='https://image.tmdb.org/t/p/w500' + movieData.poster_path;
+    this.overview = movieData.overview;
+    this.imgPath = 'https://image.tmdb.org/t/p/w500' + movieData.poster_path;
     this.id = movieData.id;
-  }  
+  }
 }
 
 
