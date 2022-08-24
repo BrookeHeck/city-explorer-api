@@ -24,7 +24,7 @@ app.get('/weather', (request, response, next) => {
     let forecastObjArr = (getForecast(request.query.city));
     response.send(forecastObjArr);
   } catch(e) {
-    next(e.message);
+    next(e);
   }
 });
 
