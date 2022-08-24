@@ -46,8 +46,8 @@ app.get('/movies', (request, response, next) => {
       query: request.query.city
     }
   }).then(function (movieData) {
-    console.log(movieData);
-    response.send(movieData.data);
+    let movieArr = movieData.data.results.map(movie => new Movie(movie));
+    response.send(movieArr);
   }).catch(function (error) {
     next(error);
   }).then(function () {
@@ -71,6 +71,15 @@ class Forecast {
     this.description = weatherData.weather.description;
     this.date = weatherData.ob_time;
   }
+}
+
+class Movie {
+  constructor(movieData) {
+    this.title = movieData.original_title;
+    this.overview= movieData.overview;
+    this.imgPath ='https://image.tmdb.org/t/p/w500' + movieData.poster_path;
+    this.id = movieData.id;
+  }  
 }
 
 
