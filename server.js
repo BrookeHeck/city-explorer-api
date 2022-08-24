@@ -19,15 +19,14 @@ app.get('/', (request, response) => {
   response.send('Hello from our server');
 });
 
-app.get('/weather', (request, response) => {
+app.get('/weather', (request, response, next) => {
   try {
     console.log(request.query.city);
     let forecastObjArr = (getForecast(request.query.city));
     response.send(forecastObjArr);
   } catch(e) {
-    next(e);
+    next(e.message);
   }
-  
 });
 
 app.get('*', (request, response) => {
