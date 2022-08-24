@@ -14,6 +14,7 @@ const axios = require('axios').default;
 const app = express();
 const PORT = process.env.PORT || 3002;
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
+const MOVIE_API_KEY = process.env.MOVIE_API_KEY;
 app.use(cors());
 
 // Routes
@@ -36,6 +37,22 @@ app.get('/weather', (request, response, next) => {
     }).then(function () {
       console.log('Data not found');
     });
+});
+
+app.get('/movies', (request, response, next) => {
+  axios.get('https://api.themoviedb.org/3/search/movie', {
+    params: {
+      api_key: MOVIE_API_KEY,
+      query: request.query.city
+    }
+  }).then(function (movieData) {
+    console.log(movieData);
+    response.send(movieData.data);
+  }).catch(function (error) {
+    next(error);
+  }).then(function () {
+    console.log('Data not found');
+  })
 });
 
 app.get('*', (request, response) => {
