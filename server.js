@@ -7,11 +7,14 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 const allData = require('./weather.json');
+const axios = require('axios').default;
 
 
 // Use
 const app = express();
 const PORT = process.env.PORT || 3002;
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
+const MOVIE_API_KEY = process.env.MOVIE_API_KEY;
 app.use(cors());
 
 // Routes
@@ -20,12 +23,41 @@ app.get('/', (request, response) => {
 });
 
 app.get('/weather', (request, response, next) => {
-  try {
-    let forecastObjArr = (getForecast(request.query.city));
-    response.send(forecastObjArr);
-  } catch(e) {
-    next(e);
-  }
+  console.log(request.query);
+  axios.get('https://api.weatherbit.io/v2.0/forecast/daily', {
+    params: {
+      key: WEATHER_API_KEY,
+      lat: request.query.lat,
+      lon: request.query.lon,
+      days: '5',
+      units: 'I'
+    }
+  }).then(function (weatherData) {
+    let fiveDayForecast = weatherData.data.data.map(forecast => {
+      return new Forecast(forecast);
+    })
+    response.send(fiveDayForecast);
+  }).catch(function (error) {
+    next(error);
+  }).then(function () {
+    console.log('Data not found');
+  });
+});
+
+app.get('/movies', (request, response, next) => {
+  axios.get('https://api.themoviedb.org/3/search/movie', {
+    params: {
+      api_key: MOVIE_API_KEY,
+      query: request.query.city
+    }
+  }).then(function (movieData) {
+    let movieArr = movieData.data.results.map(movie => new Movie(movie));
+    response.send(movieArr);
+  }).catch(function (error) {
+    next(error);
+  }).then(function () {
+    console.log('Data not found');
+  })
 });
 
 app.get('*', (request, response) => {
@@ -39,23 +71,20 @@ app.use((error, request, response, next) => {
 
 // Classes
 class Forecast {
-  constructor(description, date) {
-    this.description = description;
-    this.date = date;
+  constructor(weatherData) {
+    this.temp = weatherData.temp;
+    this.description = weatherData.weather.description;
+    this.date = weatherData.datetime;
   }
 }
 
-let getForecast = (searchQuery) => {
-  let weatherObj = allData.find(obj => obj.city_name === searchQuery);
-  let objData = weatherObj.data;
-  let forecastArr = objData.reduce((accumulator, current) => {
-    let description = `Low of ${current.app_min_temp}, high of ${current.app_min_temp} with ${current.weather.description.toLowerCase()}`;
-    let date = current.valid_date;
-    let forecast = new Forecast(description, date);
-    accumulator.push(forecast);
-    return accumulator;
-  }, []);
-  return forecastArr;
+class Movie {
+  constructor(movieData) {
+    this.title = movieData.original_title;
+    this.overview = movieData.overview;
+    this.imgPath = 'https://image.tmdb.org/t/p/w500' + movieData.poster_path;
+    this.id = movieData.id;
+  }
 }
 
 
