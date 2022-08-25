@@ -12,7 +12,9 @@ async function getMovies(request, response, next) {
     let movieArr = movieData.data.results.map(movie => new Movie(movie));
     response.send(movieArr);
   }).catch(function (error) {
-    next(error);
+    Promise.resolve().then(() => {
+      throw new Error(error.message);
+    }).catch(next);
   });
 }
 

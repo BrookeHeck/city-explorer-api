@@ -17,7 +17,9 @@ async function getWeather(request, response, next) {
     })
     response.send(fiveDayForecast);
   }).catch(function (error) {
-    next(error);
+    Promise.resolve().then(() => {
+      throw new Error(error.message);
+    }).catch(next);
   });
 }
 
