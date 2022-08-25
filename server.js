@@ -18,8 +18,8 @@ const MOVIE_API_KEY = process.env.MOVIE_API_KEY;
 app.use(cors());
 
 // Routes
-app.get('/', (request, response) => {
-  response.send('Hello from our server');
+app.get('/', (req, res) => {
+  res.status(200).send('Hello there!');
 });
 
 app.get('/weather', (request, response, next) => {
