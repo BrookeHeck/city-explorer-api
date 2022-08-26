@@ -14,10 +14,10 @@ function handleWeather(request, response, next) {
   const url = `http://api.weatherbit.io/v2.0/forecast/daily/?key=${WEATHER_API_KEY}&lang=en&lat=${lat}&lon=${lon}&days=5`;
 
   if (cache[key] && (Date.now() - cache[key].timestamp < timeToCache)) {
-    console.log('Cache hit');
+    console.log('weather cache hit');
     response.status(200).send(cache[key].data);
   } else {
-    console.log('Cache miss');
+    console.log('weather cache miss');
     axios.get(url)
     .then(weatherData => {
       cache[key] = {

@@ -11,8 +11,10 @@ function getMovies(request, response, next) {
   // let testCache = 1000 * 20;
 
   if (cache[key] && Date.now() - cache[key].timestamp < timeToCache) {
+    console.log('movie cache hit');
     response.status(200).send(cache[key].data);
   } else {
+    console.log('movie cache miss');
     let params = {
       api_key: MOVIE_API_KEY,
       query: city
