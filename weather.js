@@ -2,6 +2,8 @@ const axios = require('axios');
 
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
+let cache = {};
+
 function getWeather(request, response, next) {
   let params = {
     key: WEATHER_API_KEY,
@@ -11,12 +13,14 @@ function getWeather(request, response, next) {
     units: 'I'
   }
 
-  axios.get('https://api.weatherbit.io/v2.0/forecast/daily', {params}).then(function (weatherData) {
+  axios.get('https://api.weatherbit.io/v2.0/forecast/daily', {params})
+  .then(function (weatherData) {
     let fiveDayForecast = weatherData.data.data.map(forecast => {
       return new Forecast(forecast);
     });
     response.status(200).send(fiveDayForecast);
-  }).catch(function (error) {
+  })
+  .catch(function (error) {
     Promise.resolve().then(() => {
       throw new Error(error.message);
     }).catch(next);

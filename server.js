@@ -8,6 +8,7 @@ require('dotenv').config();
 const cors = require('cors');
 const getWeather = require('./weather.js');
 const getMovies = require('./movies.js');
+const getRestaurants = require('./yelp.js');
 
 
 // Use
@@ -25,6 +26,8 @@ app.get('/', (req, res) => {
 app.get('/weather', getWeather);
 
 app.get('/movies', getMovies);
+
+app.get('/restaurants', getRestaurants);
 
 app.get('*', (request, response) => {
   response.send('no route');
