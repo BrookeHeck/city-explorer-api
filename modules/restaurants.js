@@ -8,7 +8,9 @@ function getRestaurants(request, response, next) {
     lat: request.query.lat,
     lon: request.query.lon
   }
-  axios.get({ config })
+    
+  }
+  axios.get('https://api.yelp.com/v3/businesses/search', {params})
     .then(function (restaurantData) {
       response.status(200).send(restaurantData.data);
     })
