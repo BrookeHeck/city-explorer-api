@@ -1,41 +1,37 @@
 'use strict';
 
-// Require, use, routes, errors, listen
-
-//Require
+// Require
 const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
-const getWeather = require('./weather.js');
-const getMovies = require('./movies.js');
-
+const weatherHandler = require('./modules/weather.js');
+const getMovies = require('./modules/movies.js');
+const getRestaurants = require('./modules/restaurants');
 
 // Use
 const app = express();
 const PORT = process.env.PORT || 3002;
-
-const MOVIE_API_KEY = process.env.MOVIE_API_KEY;
 app.use(cors());
 
 // Routes
 app.get('/', (req, res) => {
-  res.status(200).send('Hello there!');
+  res.status(200).send('my awesome server');
 });
 
-app.get('/weather', getWeather);
+app.get('/weather', weatherHandler);
 
-app.get('/movies', getMovies);
+app.get('/movies', getMovies); 
 
-app.get('*', (request, response) => {
-  response.send('no route');
+app.get('/restaurants', getRestaurants);
+
+app.get('*', (req, res) => {
+  res.send('no route');
 });
 
 // Errors
 app.use((error, request, response, next) => {
   response.status(500).send(error.message);
-});
+})
 
 // Listen
-app.listen(PORT, () => console.log(`Listening on ${PORT}`));
-
-
+app.listen(PORT, () => console.log(`Server up on ${PORT}`));
