@@ -12,7 +12,8 @@ function getRestaurants(request, response, next) {
     }
   })
     .then(function (restaurantData) {
-      response.status(200).send(restaurantData.data);
+      let restaurantArr = restaurantData.data.businesses.map(restaurant => new Restaurant(restaurant));
+      response.status(200).send(restaurantArr);
     })
     .catch(function (error) {
       console.log(error);
