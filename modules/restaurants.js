@@ -29,6 +29,8 @@ class Restaurant {
     this.name = restaurantData.name;
     this.url = restaurantData.url ? restaurantData.url : '';
     this.imgUrl = restaurantData.image_url ? restaurantData.image_url : '';
+    this.rating=restaurantData.rating ? restaurantData.rating : '';
+    this.price = restaurantData.price ? restaurantData.price : '';
   }
 }
 
